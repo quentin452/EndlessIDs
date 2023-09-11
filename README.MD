@@ -1,3 +1,8 @@
+# ALERT
+Do NOT use 1.5 alpha 10, it's an experimental build and corrupts worlds! Wait for alpha 11 or stay on alpha 9!
+
+## EndlessIDs
+
 EndlessIDs is the unofficial successor of NotEnoughIDs, with more focus on compatibility, stability, and reaching
 new limits.
 
