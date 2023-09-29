@@ -39,7 +39,7 @@ public class GeneralConfig {
     @Config.DefaultBoolean(true)
     public static boolean extendPotion;
     @Config.Comment("Extend Entity IDs. Vanilla limit is 256, new limit is 32768.")
-    @Config.DefaultBoolean(true)
+    @Config.DefaultBoolean(false)
     public static boolean extendEntity;
 
     @Config.Comment("Improves the speed of the block registry by multiple orders of magnitudes. (not thoroughly tested yet)\n" +
