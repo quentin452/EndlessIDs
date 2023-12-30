@@ -1,9 +1,11 @@
 package com.falsepattern.endlessids.managers;
 
-import com.falsepattern.chunk.api.ChunkDataManager;
+import com.falsepattern.chunk.api.ArrayUtil;
+import com.falsepattern.chunk.api.DataManager;
 import com.falsepattern.endlessids.Hooks;
 import com.falsepattern.endlessids.Tags;
-import com.falsepattern.endlessids.mixin.helpers.IChunkMixin;
+import com.falsepattern.endlessids.mixin.helpers.ChunkBiomeHook;
+import lombok.val;
 import lombok.var;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +15,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import java.nio.ByteBuffer;
 
-public class BiomeManager implements ChunkDataManager, ChunkDataManager.PacketDataManager, ChunkDataManager.ChunkNBTDataManager {
+public class BiomeManager implements DataManager.PacketDataManager, DataManager.ChunkDataManager {
 
     @Override
     public String domain() {
@@ -31,17 +33,17 @@ public class BiomeManager implements ChunkDataManager, ChunkDataManager.PacketDa
     }
 
     @Override
-    public void writeToBuffer(Chunk chunk, int ebsMask, boolean forceUpdate, ByteBuffer data) {
-        data.asShortBuffer().put(((IChunkMixin)chunk).getBiomeShortArray());
+    public void writeToBuffer(Chunk chunk, int subChunkMask, boolean forceUpdate, ByteBuffer data) {
+        data.asShortBuffer().put(((ChunkBiomeHook)chunk).getBiomeShortArray());
         data.position(data.position() + maxPacketSize());
     }
 
     @Override
-    public void readFromBuffer(Chunk chunk, int ebsMask, boolean forceUpdate, ByteBuffer buffer) {
-        var arr = ((IChunkMixin)chunk).getBiomeShortArray();
+    public void readFromBuffer(Chunk chunk, int subChunkMask, boolean forceUpdate, ByteBuffer buffer) {
+        var arr = ((ChunkBiomeHook)chunk).getBiomeShortArray();
         if (arr == null) {
             arr = new short[16 * 16];
-            ((IChunkMixin)chunk).setBiomeShortArray(arr);
+            ((ChunkBiomeHook)chunk).setBiomeShortArray(arr);
         }
         buffer.asShortBuffer().get(arr);
         buffer.position(buffer.position() + maxPacketSize());
@@ -54,16 +56,16 @@ public class BiomeManager implements ChunkDataManager, ChunkDataManager.PacketDa
 
     @Override
     public void writeChunkToNBT(Chunk chunk, NBTTagCompound nbt) {
-        byte[] arr = Hooks.shortToByteArray(((IChunkMixin)chunk).getBiomeShortArray());
+        byte[] arr = Hooks.shortToByteArray(((ChunkBiomeHook)chunk).getBiomeShortArray());
         nbt.setByteArray("Biomes16v2", arr);
     }
 
     @Override
     public void readChunkFromNBT(Chunk chunk, NBTTagCompound nbt) {
-        var data = ((IChunkMixin) chunk).getBiomeShortArray();
+        var data = ((ChunkBiomeHook) chunk).getBiomeShortArray();
         if (data == null) {
             data = new short[16 * 16];
-            ((IChunkMixin)chunk).setBiomeShortArray(data);
+            ((ChunkBiomeHook)chunk).setBiomeShortArray(data);
         }
         if (nbt.hasKey("Biomes16v2", 7)) {
             Hooks.byteToShortArray(nbt.getByteArray("Biomes16v2"), 0, data, 0, data.length * 2);
@@ -73,6 +75,14 @@ public class BiomeManager implements ChunkDataManager, ChunkDataManager.PacketDa
             Hooks.scatter(nbt.getByteArray("Biomes"), data);
         }
 
+    }
+
+    @Override
+    public void cloneChunk(Chunk fromVanilla, Chunk toVanilla) {
+        val from = (ChunkBiomeHook) fromVanilla;
+        val to = (ChunkBiomeHook) toVanilla;
+
+        to.setBiomeShortArray(ArrayUtil.copyArray(from.getBiomeShortArray(), to.getBiomeShortArray()));
     }
 
     @Override

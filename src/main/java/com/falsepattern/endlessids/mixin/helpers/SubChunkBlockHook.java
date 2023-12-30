@@ -2,7 +2,7 @@ package com.falsepattern.endlessids.mixin.helpers;
 
 import net.minecraft.world.chunk.NibbleArray;
 
-public interface IExtendedBlockStorageMixin {
+public interface SubChunkBlockHook {
     byte[] getB1();
 
     void setB1(byte[] data);
@@ -11,15 +11,11 @@ public interface IExtendedBlockStorageMixin {
 
     void setB2Low(NibbleArray data);
 
-    void clearB2Low();
-
     NibbleArray createB2Low();
 
     NibbleArray getB2High();
 
     void setB2High(NibbleArray data);
-
-    void clearB2High();
 
     NibbleArray createB2High();
 
@@ -27,13 +23,11 @@ public interface IExtendedBlockStorageMixin {
 
     void setB3(byte[] data);
 
-    void clearB3();
-
     byte[] createB3();
 
-    int getEBSMask();
+    int getMetadataMask();
 
-    int getEBSMSBMask();
+    int getBlockMask();
 
     int getID(int x, int y, int z);
 
@@ -45,15 +39,11 @@ public interface IExtendedBlockStorageMixin {
 
     void setM1High(NibbleArray m1High);
 
-    void clearM1High();
-
     NibbleArray createM1High();
 
     byte[] getM2();
 
     void setM2(byte[] m2);
-
-    void clearM2();
 
     byte[] createM2();
 }

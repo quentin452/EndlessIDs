@@ -4,7 +4,7 @@ import com.falsepattern.endlessids.EndlessIDs;
 import com.falsepattern.endlessids.Hooks;
 import com.falsepattern.endlessids.Tags;
 import com.falsepattern.endlessids.config.GeneralConfig;
-import com.falsepattern.endlessids.mixin.helpers.IExtendedBlockStorageMixin;
+import com.falsepattern.endlessids.mixin.helpers.SubChunkBlockHook;
 import lombok.val;
 import lombok.var;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ import net.minecraft.world.chunk.NibbleArray;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
 @Mixin(ExtendedBlockStorage.class)
-public abstract class ExtendedBlockStorageMixin implements IExtendedBlockStorageMixin {
+public abstract class ExtendedBlockStorageMixin implements SubChunkBlockHook {
     @Shadow
     private int blockRefCount;
     @Shadow
@@ -197,11 +197,6 @@ public abstract class ExtendedBlockStorageMixin implements IExtendedBlockStorage
     }
 
     @Override
-    public void clearB2Low() {
-        blockMSBArray = null;
-    }
-
-    @Override
     public NibbleArray createB2Low() {
         return (blockMSBArray = new NibbleArray(blockLSBArray.length, 4));
     }
@@ -217,11 +212,6 @@ public abstract class ExtendedBlockStorageMixin implements IExtendedBlockStorage
     }
 
     @Override
-    public void clearB2High() {
-        b2High = null;
-    }
-
-    @Override
     public NibbleArray createB2High() {
         return (b2High = new NibbleArray(blockLSBArray.length, 4));
     }
@@ -234,11 +224,6 @@ public abstract class ExtendedBlockStorageMixin implements IExtendedBlockStorage
     @Override
     public void setB3(byte[] data) {
         b3 = data;
-    }
-
-    @Override
-    public void clearB3() {
-        b3 = null;
     }
 
     @Override
@@ -267,11 +252,6 @@ public abstract class ExtendedBlockStorageMixin implements IExtendedBlockStorage
     }
 
     @Override
-    public void clearM1High() {
-        m1High = null;
-    }
-
-    @Override
     public NibbleArray createM1High() {
         return (m1High = new NibbleArray(blockLSBArray.length, 4));
     }
@@ -287,17 +267,12 @@ public abstract class ExtendedBlockStorageMixin implements IExtendedBlockStorage
     }
 
     @Override
-    public void clearM2() {
-        m2 = null;
-    }
-
-    @Override
     public byte[] createM2() {
         return (m2 = new byte[blockLSBArray.length]);
     }
 
     @Override
-    public int getEBSMSBMask() {
+    public int getBlockMask() {
         if (blockMSBArray == null) {
             return 0b00;
         }
@@ -311,7 +286,7 @@ public abstract class ExtendedBlockStorageMixin implements IExtendedBlockStorage
     }
 
     @Override
-    public int getEBSMask() {
+    public int getMetadataMask() {
         if (m1High == null) {
             return 0b01;
         }
